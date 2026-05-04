@@ -2,13 +2,26 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 get_header();
 
-// ─── Featured game ────────────────────────────────────────────────────────────
-$featured = new WP_Query( [
-    'post_type'      => 'juego',
-    'post_status'    => 'publish',
-    'posts_per_page' => 1,
-    'meta_query'     => [ [ 'key' => 'juego_destacado', 'value' => '1' ] ],
-] );
+if ( ! have_posts() ) { get_footer(); exit; }
+the_post();
+
+$gid   = get_the_ID();
+$game_title = get_the_title();
+
+$logo        = get_field( 'juego_logo',            $gid );
+$hero_bg     = get_field( 'juego_hero_bg',         $gid );
+$hero_video  = get_field( 'juego_hero_video_bg',   $gid );
+$tagline     = get_field( 'juego_tagline',         $gid );
+$genero      = get_field( 'juego_genero',          $gid );
+$estado      = get_field( 'juego_estado',          $gid );
+$fecha       = get_field( 'juego_fecha',           $gid );
+$resumen     = get_field( 'juego_resumen',         $gid );
+$steam       = get_field( 'juego_plataforma_steam',  $gid );
+$ps5         = get_field( 'juego_plataforma_ps5',    $gid );
+$xbox        = get_field( 'juego_plataforma_xbox',   $gid );
+$switch_plat = get_field( 'juego_plataforma_switch', $gid );
+$steam_url   = get_field( 'juego_steam_url',       $gid );
+$trailer_url = get_field( 'juego_trailer_url',     $gid );
 
 $estado_labels = [
     'desarrollo'   => 'En Desarrollo',
@@ -17,6 +30,28 @@ $estado_labels = [
     'lanzado'      => 'Lanzado',
     'proximamente' => 'Próximamente',
 ];
+$estado_label = isset( $estado_labels[ $estado ] ) ? $estado_labels[ $estado ] : '';
+
+$features = [];
+for ( $n = 1; $n <= 6; $n++ ) {
+    $t = get_field( "juego_feature_{$n}_titulo", $gid );
+    $d = get_field( "juego_feature_{$n}_desc",   $gid );
+    if ( $t ) $features[] = [ 'titulo' => $t, 'desc' => $d ];
+}
+
+$galeria = [];
+for ( $n = 1; $n <= 10; $n++ ) {
+    $img = get_field( "juego_img_{$n}", $gid );
+    if ( $img ) $galeria[] = $img;
+}
+
+$galeria_videos = [];
+for ( $v = 1; $v <= 4; $v++ ) {
+    $url = get_field( "juego_galeria_video_{$v}", $gid );
+    if ( $url ) $galeria_videos[] = $url;
+}
+
+$bg_style = ( ! $hero_video && $hero_bg ) ? 'background-image:url(' . esc_url( $hero_bg['url'] ) . ')' : '';
 
 $feature_icons = [
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1M4.22 4.22l.707.707M18.364 18.364l.707.707M3 12H4m16 0h1M4.22 19.78l.707-.707M18.364 5.636l.707-.707M15.536 8.464a5 5 0 11-7.072 7.072 5 5 0 017.072-7.072z"/></svg>',
@@ -26,46 +61,10 @@ $feature_icons = [
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.091z"/></svg>',
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7a6.046 6.046 0 01-2.7-2.7"/></svg>',
 ];
-
-if ( $featured->have_posts() ) :
-    $featured->the_post();
-    $gid         = get_the_ID();
-    $logo        = get_field( 'juego_logo',            $gid );
-    $hero_bg     = get_field( 'juego_hero_bg',         $gid );
-    $hero_video  = get_field( 'juego_hero_video_bg',   $gid );
-    $tagline     = get_field( 'juego_tagline',         $gid );
-    $genero      = get_field( 'juego_genero',          $gid );
-    $estado      = get_field( 'juego_estado',          $gid );
-    $fecha       = get_field( 'juego_fecha',           $gid );
-    $resumen     = get_field( 'juego_resumen',         $gid );
-    $steam       = get_field( 'juego_plataforma_steam',  $gid );
-    $ps5         = get_field( 'juego_plataforma_ps5',    $gid );
-    $xbox        = get_field( 'juego_plataforma_xbox',   $gid );
-    $switch      = get_field( 'juego_plataforma_switch', $gid );
-    $steam_url   = get_field( 'juego_steam_url',       $gid );
-    $trailer_url = get_field( 'juego_trailer_url',     $gid );
-    $game_title  = get_the_title();
-
-    // Galería: imágenes individuales
-    $galeria = [];
-    for ( $n = 1; $n <= 10; $n++ ) {
-        $img = get_field( "juego_img_{$n}", $gid );
-        if ( $img ) $galeria[] = $img;
-    }
-
-    $galeria_videos = [];
-    for ( $v = 1; $v <= 4; $v++ ) {
-        $url = get_field( "juego_galeria_video_{$v}", $gid );
-        if ( $url ) $galeria_videos[] = $url;
-    }
-
-    $estado_label = isset( $estado_labels[ $estado ] ) ? $estado_labels[ $estado ] : '';
-    // Only apply bg-image inline style when there's no video (video takes over)
-    $bg_style = ( ! $hero_video && $hero_bg ) ? 'background-image:url(' . esc_url( $hero_bg['url'] ) . ')' : '';
 ?>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     JUEGO HERO — cinematic full-screen
+     HERO
      ═══════════════════════════════════════════════════════════════ -->
 <section class="juego-hero" style="<?php echo $bg_style; ?>" aria-label="<?php echo esc_attr( $game_title ); ?>">
 
@@ -128,7 +127,7 @@ if ( $featured->have_posts() ) :
                     <span>Xbox</span>
                 </span>
             <?php endif; ?>
-            <?php if ( $switch ) : ?>
+            <?php if ( $switch_plat ) : ?>
                 <span class="juego-hero__platform" title="Nintendo Switch">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-label="Nintendo Switch"><path d="M14.176 24h3.674A6.15 6.15 0 0024 17.85V6.15A6.15 6.15 0 0017.85 0H14.176v24zM18 6.75a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM6.15 0A6.15 6.15 0 000 6.15v11.7A6.15 6.15 0 006.15 24h5.326V0H6.15zm.6 16.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
                     <span>Switch</span>
@@ -148,6 +147,12 @@ if ( $featured->have_posts() ) :
                     Ver Tráiler
                 </a>
             <?php endif; ?>
+            <a href="<?php echo esc_url( home_url( '/juegos/' ) ); ?>" class="btn btn--ghost juego-single__back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+                </svg>
+                Todos los juegos
+            </a>
         </div>
 
     </div>
@@ -182,15 +187,7 @@ if ( $featured->have_posts() ) :
 <!-- ═══════════════════════════════════════════════════════════════
      CARACTERÍSTICAS
      ═══════════════════════════════════════════════════════════════ -->
-<?php
-$features = [];
-for ( $n = 1; $n <= 6; $n++ ) {
-    $t = get_field( "juego_feature_{$n}_titulo", $gid );
-    $d = get_field( "juego_feature_{$n}_desc",   $gid );
-    if ( $t ) $features[] = [ 'titulo' => $t, 'desc' => $d ];
-}
-if ( $features ) :
-?>
+<?php if ( $features ) : ?>
 <section class="section section--surface juego-features">
     <div class="container">
         <header class="section__header animate-on-scroll">
@@ -226,24 +223,21 @@ if ( $features ) :
         </header>
         <div class="juego-galeria-grid animate-on-scroll">
 
-            <?php if ( $galeria ) : ?>
-                <?php foreach ( $galeria as $img ) : ?>
-                    <div class="juego-galeria-item juego-galeria-item--img"
-                         data-src="<?php echo esc_url( $img['url'] ); ?>"
-                         tabindex="0"
-                         role="button"
-                         aria-label="<?php echo esc_attr( $img['alt'] ?: $game_title ); ?>">
-                        <img src="<?php echo esc_url( $img['sizes']['large'] ?? $img['url'] ); ?>"
-                             alt="<?php echo esc_attr( $img['alt'] ?: $game_title ); ?>"
-                             loading="lazy">
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+            <?php foreach ( $galeria as $img ) : ?>
+                <div class="juego-galeria-item juego-galeria-item--img"
+                     data-src="<?php echo esc_url( $img['url'] ); ?>"
+                     tabindex="0"
+                     role="button"
+                     aria-label="<?php echo esc_attr( $img['alt'] ?: $game_title ); ?>">
+                    <img src="<?php echo esc_url( $img['sizes']['large'] ?? $img['url'] ); ?>"
+                         alt="<?php echo esc_attr( $img['alt'] ?: $game_title ); ?>"
+                         loading="lazy">
+                </div>
+            <?php endforeach; ?>
 
             <?php foreach ( $galeria_videos as $vid_url ) :
                 $embed = preg_replace( '/watch\?v=/', 'embed/', $vid_url );
                 $embed = preg_replace( '/youtu\.be\//', 'youtube.com/embed/', $embed );
-                // Append autoplay=0 to prevent auto-start inside gallery
                 $embed = add_query_arg( [ 'rel' => '0' ], $embed );
             ?>
                 <div class="juego-galeria-item juego-galeria-item--video">
@@ -355,37 +349,41 @@ if ( $features ) :
 </section>
 <?php endif; ?>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     BACK / OTROS JUEGOS
+     ═══════════════════════════════════════════════════════════════ -->
 <?php
-    wp_reset_postdata();
-endif; // end featured game
-
-// ─── Other games ──────────────────────────────────────────────────────────────
 $otros = new WP_Query( [
     'post_type'      => 'juego',
-    'post_status'    => 'publish',
-    'posts_per_page' => -1,
-    'post__not_in'   => isset( $gid ) ? [ $gid ] : [],
+    'posts_per_page' => 3,
+    'post__not_in'   => [ $gid ],
+    'orderby'        => 'rand',
 ] );
 
 if ( $otros->have_posts() ) :
 ?>
-<!-- ═══════════════════════════════════════════════════════════════
-     OTROS JUEGOS
-     ═══════════════════════════════════════════════════════════════ -->
-<section class="section section--surface juego-otros-section">
+<section class="section section--dark juego-otros-section">
     <div class="container">
         <header class="section__header animate-on-scroll">
-            <span class="section__label">Catálogo</span>
-            <h2><span class="gradient-text">Más Títulos</span></h2>
+            <span class="section__label">Más títulos</span>
+            <h2><span class="gradient-text">Otros Juegos</span></h2>
         </header>
         <div class="juego-otros-grid">
-        <?php while ( $otros->have_posts() ) : $otros->the_post();
+        <?php
+        $estado_labels_local = [
+            'desarrollo'   => 'En Desarrollo',
+            'demo'         => 'Demo Disponible',
+            'early_access' => 'Acceso Anticipado',
+            'lanzado'      => 'Lanzado',
+            'proximamente' => 'Próximamente',
+        ];
+        while ( $otros->have_posts() ) : $otros->the_post();
             $oid    = get_the_ID();
-            $obg    = get_field( 'juego_hero_bg',    $oid );
-            $ologo  = get_field( 'juego_logo',       $oid );
-            $oestado = get_field( 'juego_estado',    $oid );
-            $ogenero = get_field( 'juego_genero',    $oid );
-            $oestado_label = isset( $estado_labels[ $oestado ] ) ? $estado_labels[ $oestado ] : '';
+            $obg    = get_field( 'juego_hero_bg', $oid );
+            $ologo  = get_field( 'juego_logo',    $oid );
+            $oestado = get_field( 'juego_estado', $oid );
+            $ogenero = get_field( 'juego_genero', $oid );
+            $oestado_label = isset( $estado_labels_local[ $oestado ] ) ? $estado_labels_local[ $oestado ] : '';
             $obg_style = $obg ? 'background-image:url(' . esc_url( $obg['url'] ) . ')' : '';
         ?>
             <a href="<?php the_permalink(); ?>" class="juego-otros-card animate-on-scroll" style="<?php echo $obg_style; ?>" aria-label="<?php echo esc_attr( get_the_title() ); ?>">
@@ -410,22 +408,12 @@ if ( $otros->have_posts() ) :
             </a>
         <?php endwhile; wp_reset_postdata(); ?>
         </div>
-    </div>
-</section>
-<?php endif; ?>
 
-<?php
-// ─── No games at all fallback ─────────────────────────────────────────────────
-if ( ! $featured->have_posts() && ! $otros->have_posts() ) :
-    get_template_part( 'template-parts/page-hero', null, [
-        'label'    => 'Catálogo',
-        'title'    => 'Nuestros Juegos',
-        'subtitle' => 'Universos construidos con pasión. Cada título es una historia que espera ser vivida.',
-    ] );
-?>
-<section class="section section--dark">
-    <div class="container" style="text-align:center;padding:var(--space-20) 0;">
-        <p style="color:var(--color-muted);">Próximos juegos en camino. ¡Mantente al tanto!</p>
+        <div style="text-align:center;margin-top:var(--space-10);">
+            <a href="<?php echo esc_url( home_url( '/juegos/' ) ); ?>" class="btn btn--outline">
+                Ver todos los juegos
+            </a>
+        </div>
     </div>
 </section>
 <?php endif; ?>
