@@ -17,8 +17,12 @@ get_header();
             'post_type'      => 'miembro-equipo',
             'posts_per_page' => -1,
             'post_status'    => 'publish',
-            'orderby'        => [ 'meta_value_num' => 'ASC', 'title' => 'ASC' ],
-            'meta_key'       => 'orden',
+            'meta_query'     => [
+                'relation'          => 'OR',
+                'orden_clause'      => [ 'key' => 'orden', 'compare' => 'EXISTS' ],
+                'orden_not_exists'  => [ 'key' => 'orden', 'compare' => 'NOT EXISTS' ],
+            ],
+            'orderby'        => [ 'orden_clause' => 'ASC', 'title' => 'ASC' ],
         ] );
         ?>
 

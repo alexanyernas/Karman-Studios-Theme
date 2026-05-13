@@ -3204,7 +3204,6 @@ p {
 .page-juegos .header__topbar,
 .single-juego .header__topbar {
     background-color: transparent;
-    border-bottom-color: transparent;
 }
 
 /* Al hacer scroll vuelve el fondo sólido */

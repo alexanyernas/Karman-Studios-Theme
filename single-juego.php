@@ -20,8 +20,11 @@ $steam       = get_field( 'juego_plataforma_steam',  $gid );
 $ps5         = get_field( 'juego_plataforma_ps5',    $gid );
 $xbox        = get_field( 'juego_plataforma_xbox',   $gid );
 $switch_plat = get_field( 'juego_plataforma_switch', $gid );
-$steam_url   = get_field( 'juego_steam_url',       $gid );
-$trailer_url = get_field( 'juego_trailer_url',     $gid );
+$steam_url   = get_field( 'juego_steam_url',   $gid );
+$ps5_url     = get_field( 'juego_ps5_url',    $gid );
+$xbox_url    = get_field( 'juego_xbox_url',   $gid );
+$switch_url  = get_field( 'juego_switch_url', $gid );
+$trailer_url = get_field( 'juego_trailer_url', $gid );
 
 $estado_labels = [
     'desarrollo'   => 'En Desarrollo',
@@ -109,30 +112,26 @@ $feature_icons = [
         </div>
 
         <div class="juego-hero__platforms">
-            <?php if ( $steam ) : ?>
-                <span class="juego-hero__platform" title="PC — Steam">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-label="Steam"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.606 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.455 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.252 0-2.265-1.014-2.265-2.265z"/></svg>
-                    <span>Steam</span>
-                </span>
-            <?php endif; ?>
-            <?php if ( $ps5 ) : ?>
-                <span class="juego-hero__platform" title="PlayStation 5">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-label="PlayStation"><path d="M8.984 2.596v14.347l3.274 1.01V5.66s2.757-.485 3.494 1.426c.868 2.28-1.177 3.44-1.177 3.44s3.527.68 5.156-2.507c1.23-2.38-.05-5.423-5.01-5.423-2.044 0-5.737 0-5.737 0zm-2.667 15.24L2 16.168v2.09l4.317 1.545v-2.04-.927zm0 2.967v-.927L2 18.258v2.09l4.317-1.545zm10.667-5.42s-1.258.448-2.41.69v1.847s2.397-.534 3.87-1.603c1.475-1.07 1.655-2.783.003-3.44-1.653-.657-3.79-.1-3.79-.1v1.716s1.37-.433 2.327.065c.956.499.001 1.34.001 1.34l-.001-.515z"/></svg>
-                    <span>PS5</span>
-                </span>
-            <?php endif; ?>
-            <?php if ( $xbox ) : ?>
-                <span class="juego-hero__platform" title="Xbox">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-label="Xbox"><path d="M4.102 4.102C4.102 4.102 6.54 1.5 12 1.5s7.898 2.602 7.898 2.602S17.04 0 12 0 4.102 4.102 4.102 4.102zM5.906 5.58C3.76 7.163 2.082 9.43 1.246 12.07c-.042.135-.042.274-.042.413 0 .862.21 1.677.581 2.393C2.617 16.32 4.89 24 12 24s9.383-7.68 10.215-9.124c.37-.716.581-1.531.581-2.393 0-.139 0-.278-.042-.413-.836-2.64-2.514-4.907-4.66-6.49-.672-.5-1.376-.926-2.124-1.266C14.64 5.4 13.374 5.1 12 5.1c-1.374 0-2.64.3-3.97.814-.748.34-1.452.766-2.124 1.266z"/></svg>
-                    <span>Xbox</span>
-                </span>
-            <?php endif; ?>
-            <?php if ( $switch_plat ) : ?>
-                <span class="juego-hero__platform" title="Nintendo Switch">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-label="Nintendo Switch"><path d="M14.176 24h3.674A6.15 6.15 0 0024 17.85V6.15A6.15 6.15 0 0017.85 0H14.176v24zM18 6.75a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM6.15 0A6.15 6.15 0 000 6.15v11.7A6.15 6.15 0 006.15 24h5.326V0H6.15zm.6 16.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
-                    <span>Switch</span>
-                </span>
-            <?php endif; ?>
+            <?php
+            $plat_badges = [
+                [ 'active' => $steam,       'url' => $steam_url,  'title' => 'PC — Steam',      'label' => 'Steam',       'logo_key' => 'plat_steam_logo'       ],
+                [ 'active' => $ps5,         'url' => $ps5_url,    'title' => 'PlayStation 5',   'label' => 'PlayStation', 'logo_key' => 'plat_playstation_logo' ],
+                [ 'active' => $xbox,        'url' => $xbox_url,   'title' => 'Xbox',            'label' => 'Xbox',        'logo_key' => 'plat_xbox_logo'        ],
+                [ 'active' => $switch_plat, 'url' => $switch_url, 'title' => 'Nintendo Switch', 'label' => 'Nintendo',    'logo_key' => 'plat_nintendo_logo'    ],
+            ];
+            foreach ( $plat_badges as $p ) :
+                if ( ! $p['active'] ) continue;
+                $tag      = $p['url'] ? 'a' : 'span';
+                $attrs    = $p['url'] ? sprintf( ' href="%s" target="_blank" rel="noopener noreferrer"', esc_url( $p['url'] ) ) : '';
+                $logo_img = karman_opt( $p['logo_key'] );
+            ?>
+                <<?php echo $tag; ?> class="juego-hero__platform" title="<?php echo esc_attr( $p['title'] ); ?>"<?php echo $attrs; ?>>
+                    <?php if ( $logo_img ) : ?>
+                        <img src="<?php echo esc_url( $logo_img ); ?>" alt="<?php echo esc_attr( $p['title'] ); ?>" style="height:20px;width:auto;object-fit:contain;">
+                    <?php endif; ?>
+                    <span><?php echo esc_html( $p['label'] ); ?></span>
+                </<?php echo $tag; ?>>
+            <?php endforeach; ?>
         </div>
 
         <div class="juego-hero__cta">
@@ -147,10 +146,7 @@ $feature_icons = [
                     Ver Tráiler
                 </a>
             <?php endif; ?>
-            <a href="<?php echo esc_url( home_url( '/juegos/' ) ); ?>" class="btn btn--ghost juego-single__back">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
-                </svg>
+            <a href="<?php echo esc_url( home_url( '/juegos/' ) ); ?>" class="btn btn--outline btn--lg">
                 Todos los juegos
             </a>
         </div>

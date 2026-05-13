@@ -36,9 +36,22 @@ get_header();
             </a>
         </div>
 
+        <?php
+        $plat_hero_labels = [
+            'plat_steam'       => 'PC &mdash; Steam',
+            'plat_xbox'        => 'Xbox',
+            'plat_playstation' => 'PlayStation',
+            'plat_nintendo'    => 'Nintendo Switch',
+        ];
+        $active_hero_plats = array_filter( $plat_hero_labels, fn( $k ) => karman_opt( $k ) === '1', ARRAY_FILTER_USE_KEY );
+        ?>
+        <?php if ( $active_hero_plats ) : ?>
         <div class="hero__platforms">
-            <span class="hero__platform">PC &mdash; Steam</span>
+            <?php foreach ( $active_hero_plats as $label ) : ?>
+                <span class="hero__platform"><?php echo $label; ?></span>
+            <?php endforeach; ?>
         </div>
+        <?php endif; ?>
     </div>
 
     <div class="hero__scroll-cue" aria-hidden="true">
@@ -256,26 +269,43 @@ $news_query = new WP_Query( [
 <!-- ═══════════════════════════════════════════════════════════════
      PLATAFORMAS
      ═══════════════════════════════════════════════════════════════ -->
+<?php
+$plat_cards = [
+    'plat_steam'       => [ 'title' => 'PC',          'sub' => 'Steam'      ],
+    'plat_xbox'        => [ 'title' => 'Xbox',         'sub' => 'Series X|S' ],
+    'plat_playstation' => [ 'title' => 'PlayStation',  'sub' => 'PS5'        ],
+    'plat_nintendo'    => [ 'title' => 'Nintendo',     'sub' => 'Switch'     ],
+];
+$active_plat_cards = array_filter( $plat_cards, fn( $k ) => karman_opt( $k ) === '1', ARRAY_FILTER_USE_KEY );
+?>
+<?php if ( $active_plat_cards ) : ?>
 <section class="section section--surface" id="plataformas">
     <div class="container">
         <header class="section__header animate-on-scroll">
             <span class="section__label">Disponibilidad</span>
             <h2><span class="gradient-text">Plataformas</span></h2>
-            <p>Disponible en PC a través de Steam.</p>
         </header>
 
-        <div class="platforms-grid platforms-grid--single animate-on-scroll">
+        <div class="platforms-grid <?php echo count( $active_plat_cards ) === 1 ? 'platforms-grid--single' : ''; ?> animate-on-scroll">
+            <?php foreach ( $active_plat_cards as $key => $plat ) :
+                $logo = karman_opt( $key . '_logo' );
+            ?>
             <div class="platform-card">
+                <?php if ( $logo ) : ?>
                 <div class="platform-card__icon">
-                    <img src="<?php echo esc_url( wp_upload_dir()['baseurl'] . '/2026/04/steam-icon-logo.webp' ); ?>"
-                         alt="Steam" width="40" height="40" style="width:40px;height:40px;object-fit:contain;">
+                    <img src="<?php echo esc_url( $logo ); ?>"
+                         alt="<?php echo esc_attr( $plat['title'] ); ?>"
+                         style="max-height:40px;max-width:80px;object-fit:contain;">
                 </div>
-                <h4>PC</h4>
-                <span>Steam</span>
+                <?php endif; ?>
+                <h4><?php echo esc_html( $plat['title'] ); ?></h4>
+                <span><?php echo esc_html( $plat['sub'] ); ?></span>
             </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 
 <!-- ═══════════════════════════════════════════════════════════════

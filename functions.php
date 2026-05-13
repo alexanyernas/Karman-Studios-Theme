@@ -263,6 +263,15 @@ add_action( 'acf/init', function () {
                 'rows'         => 3,
                 'instructions' => '(Opcional) Descripción breve. Aparece en el hover de la card.',
             ],
+            [
+                'key'          => 'field_equipo_orden',
+                'label'        => 'Orden',
+                'name'         => 'orden',
+                'type'         => 'number',
+                'instructions' => '(Opcional) Número para ordenar la tarjeta. Menor número = aparece antes.',
+                'placeholder'  => 'Ej: 1',
+                'min'          => 0,
+            ],
         ],
         'location' => [
             [ [ 'param' => 'post_type', 'operator' => '==', 'value' => 'miembro-equipo' ] ],
@@ -394,14 +403,38 @@ add_action( 'acf/init', function () {
                 'ui'            => 1,
                 'default_value' => 0,
             ],
-            // URLs
+            // URLs de tiendas
             [
                 'key'          => 'field_juego_steam_url',
                 'label'        => 'URL de Steam',
                 'name'         => 'juego_steam_url',
                 'type'         => 'url',
                 'placeholder'  => 'https://store.steampowered.com/app/...',
-                'instructions' => '(Opcional) Enlace a la página del juego en Steam.',
+                'instructions' => '(Opcional) Al hacer clic en el badge de Steam redirige aquí.',
+            ],
+            [
+                'key'          => 'field_juego_ps5_url',
+                'label'        => 'URL de PlayStation Store',
+                'name'         => 'juego_ps5_url',
+                'type'         => 'url',
+                'placeholder'  => 'https://store.playstation.com/...',
+                'instructions' => '(Opcional) Al hacer clic en el badge de PS5 redirige aquí.',
+            ],
+            [
+                'key'          => 'field_juego_xbox_url',
+                'label'        => 'URL de Xbox Store',
+                'name'         => 'juego_xbox_url',
+                'type'         => 'url',
+                'placeholder'  => 'https://www.xbox.com/games/...',
+                'instructions' => '(Opcional) Al hacer clic en el badge de Xbox redirige aquí.',
+            ],
+            [
+                'key'          => 'field_juego_switch_url',
+                'label'        => 'URL de Nintendo eShop',
+                'name'         => 'juego_switch_url',
+                'type'         => 'url',
+                'placeholder'  => 'https://www.nintendo.com/store/...',
+                'instructions' => '(Opcional) Al hacer clic en el badge de Switch redirige aquí.',
             ],
             [
                 'key'          => 'field_juego_trailer_url',
@@ -835,13 +868,23 @@ add_action( 'admin_init', function () {
     ] );
 } );
 
+add_action( 'admin_enqueue_scripts', function ( $hook ) {
+    if ( $hook === 'toplevel_page_karman-settings' ) {
+        wp_enqueue_media();
+    }
+} );
+
 function karman_sanitize_options( array $input ): array {
     $clean = [];
-    $urls  = [ 'youtube', 'twitter', 'twitch', 'discord', 'instagram', 'tiktok', 'facebook' ];
-    $texts = [ 'email_1', 'email_2', 'hero_cta_text', 'hero_cta_url', 'telefono' ];
+    $urls        = [ 'youtube', 'twitter', 'twitch', 'discord', 'instagram', 'tiktok', 'facebook' ];
+    $texts       = [ 'email_1', 'email_2', 'hero_cta_text', 'hero_cta_url', 'telefono' ];
+    $checkboxes  = [ 'plat_steam', 'plat_xbox', 'plat_playstation', 'plat_nintendo' ];
+    $logo_urls   = [ 'plat_steam_logo', 'plat_xbox_logo', 'plat_playstation_logo', 'plat_nintendo_logo' ];
 
-    foreach ( $urls  as $k ) $clean[ $k ] = isset( $input[ $k ] ) ? esc_url_raw( $input[ $k ] )        : '';
-    foreach ( $texts as $k ) $clean[ $k ] = isset( $input[ $k ] ) ? sanitize_text_field( $input[ $k ] ) : '';
+    foreach ( $urls       as $k ) $clean[ $k ] = isset( $input[ $k ] ) ? esc_url_raw( $input[ $k ] )        : '';
+    foreach ( $texts      as $k ) $clean[ $k ] = isset( $input[ $k ] ) ? sanitize_text_field( $input[ $k ] ) : '';
+    foreach ( $checkboxes as $k ) $clean[ $k ] = ! empty( $input[ $k ] ) ? '1' : '';
+    foreach ( $logo_urls  as $k ) $clean[ $k ] = isset( $input[ $k ] ) ? esc_url_raw( $input[ $k ] )        : '';
 
     if ( ! empty( $input['email_1'] ) ) $clean['email_1'] = sanitize_email( $input['email_1'] );
     if ( ! empty( $input['email_2'] ) ) $clean['email_2'] = sanitize_email( $input['email_2'] );
@@ -917,6 +960,78 @@ function karman_settings_page(): void { ?>
                 <td><input type="url" id="ks_cta_url" name="karman_options[hero_cta_url]" value="<?php echo esc_attr( $o['hero_cta_url'] ?? '' ); ?>" class="regular-text" placeholder="https://..."></td>
             </tr>
         </table>
+
+        <h2 class="title">Plataformas</h2>
+        <p class="description" style="margin-bottom:12px;">Activa las plataformas en las que Karman Studios publica sus juegos. Aparecen en el Hero y en la sección de Plataformas de la página de inicio. Sube el logo que se mostrará en la tarjeta de cada plataforma.</p>
+        <?php
+        $plat_defs = [
+            'plat_steam'       => 'PC — Steam',
+            'plat_xbox'        => 'Xbox',
+            'plat_playstation' => 'PlayStation',
+            'plat_nintendo'    => 'Nintendo Switch',
+        ];
+        ?>
+        <table class="form-table" role="presentation">
+            <?php foreach ( $plat_defs as $key => $label ) :
+                $logo_key  = $key . '_logo';
+                $logo_val  = $o[ $logo_key ] ?? '';
+                $input_id  = 'ks_' . $logo_key;
+                $preview_id = 'ks_prev_' . $key;
+            ?>
+            <tr>
+                <th><?php echo esc_html( $label ); ?></th>
+                <td>
+                    <label style="display:block;margin-bottom:10px;">
+                        <input type="checkbox" name="karman_options[<?php echo esc_attr( $key ); ?>]" value="1" <?php checked( '1', $o[ $key ] ?? '' ); ?>>
+                        Habilitado
+                    </label>
+                    <img id="<?php echo esc_attr( $preview_id ); ?>"
+                         src="<?php echo esc_url( $logo_val ); ?>"
+                         style="max-height:56px;display:<?php echo $logo_val ? 'block' : 'none'; ?>;margin-bottom:8px;border-radius:4px;background:#1a1a2e;padding:6px;">
+                    <input type="hidden"
+                           id="<?php echo esc_attr( $input_id ); ?>"
+                           name="karman_options[<?php echo esc_attr( $logo_key ); ?>]"
+                           value="<?php echo esc_attr( $logo_val ); ?>">
+                    <button type="button" class="button ks-media-btn"
+                            data-input="<?php echo esc_attr( $input_id ); ?>"
+                            data-preview="<?php echo esc_attr( $preview_id ); ?>">
+                        <?php echo $logo_val ? 'Cambiar logo' : 'Seleccionar logo'; ?>
+                    </button>
+                    <?php if ( $logo_val ) : ?>
+                    <button type="button" class="button ks-media-remove"
+                            data-input="<?php echo esc_attr( $input_id ); ?>"
+                            data-preview="<?php echo esc_attr( $preview_id ); ?>">
+                        Quitar
+                    </button>
+                    <?php endif; ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+        <script>
+        jQuery(function($){
+            $(document).on('click', '.ks-media-btn', function(e){
+                e.preventDefault();
+                var btn      = $(this);
+                var inputId  = btn.data('input');
+                var prevId   = btn.data('preview');
+                var frame    = wp.media({ title: 'Seleccionar logo', button: { text: 'Usar este logo' }, multiple: false, library: { type: 'image' } });
+                frame.on('select', function(){
+                    var att = frame.state().get('selection').first().toJSON();
+                    $('#' + inputId).val(att.url);
+                    $('#' + prevId).attr('src', att.url).show();
+                    btn.text('Cambiar logo');
+                });
+                frame.open();
+            });
+            $(document).on('click', '.ks-media-remove', function(e){
+                e.preventDefault();
+                var btn = $(this);
+                $('#' + btn.data('input')).val('');
+                $('#' + btn.data('preview')).attr('src','').hide();
+            });
+        });
+        </script>
 
         <?php submit_button( 'Guardar Cambios' ); ?>
     </form>
