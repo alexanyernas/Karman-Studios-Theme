@@ -359,8 +359,6 @@ if ( $features ) :
 endif; // end featured game
 
 // ─── Other games ──────────────────────────────────────────────────────────────
-$total_juegos_publicados = wp_count_posts( 'juego' )->publish;
-
 $otros = new WP_Query( [
     'post_type'      => 'juego',
     'post_status'    => 'publish',
@@ -368,45 +366,44 @@ $otros = new WP_Query( [
     'post__not_in'   => isset( $gid ) ? [ $gid ] : [],
 ] );
 
-if ( $total_juegos_publicados >= 2 && $otros->have_posts() ) :
+if ( $otros->have_posts() ) :
+    $hay_destacado = isset( $gid );
+
+    if ( ! $hay_destacado ) :
+        get_template_part( 'template-parts/page-hero', null, [
+            'label'    => 'Todos Nuestros Títulos',
+            'title'    => 'Nuestros Juegos',
+            'subtitle' => 'Explora los mundos que estamos construyendo.',
+        ] );
+    endif;
 ?>
 <!-- ═══════════════════════════════════════════════════════════════
      OTROS JUEGOS
      ═══════════════════════════════════════════════════════════════ -->
 <section class="section section--surface juego-otros-section">
     <div class="container">
+        <?php if ( $hay_destacado ) : ?>
         <header class="section__header animate-on-scroll">
             <span class="section__label">Catálogo</span>
             <h2><span class="gradient-text">Más Títulos</span></h2>
         </header>
+        <?php endif; ?>
         <div class="juego-otros-grid">
         <?php while ( $otros->have_posts() ) : $otros->the_post();
-            $oid    = get_the_ID();
-            $obg    = get_field( 'juego_hero_bg',    $oid );
-            $ologo  = get_field( 'juego_logo',       $oid );
-            $oestado = get_field( 'juego_estado',    $oid );
-            $ogenero = get_field( 'juego_genero',    $oid );
-            $oestado_label = isset( $estado_labels[ $oestado ] ) ? $estado_labels[ $oestado ] : '';
-            $obg_style = $obg ? 'background-image:url(' . esc_url( $obg['url'] ) . ')' : '';
+            $oid      = get_the_ID();
+            $obg      = get_field( 'juego_hero_bg', $oid );
+            $othumbnail = get_the_post_thumbnail_url( $oid, 'large' );
+            $obg_url  = $obg['url'] ?? $othumbnail ?? '';
+            $obg_style = $obg_url ? 'background-image:url(' . esc_url( $obg_url ) . ')' : '';
         ?>
             <a href="<?php the_permalink(); ?>" class="juego-otros-card animate-on-scroll" style="<?php echo $obg_style; ?>" aria-label="<?php echo esc_attr( get_the_title() ); ?>">
                 <div class="juego-otros-card__overlay"></div>
                 <div class="juego-otros-card__body">
-                    <?php if ( $ologo ) : ?>
-                        <img src="<?php echo esc_url( $ologo['url'] ); ?>"
-                             alt="<?php echo esc_attr( get_the_title() ); ?>"
-                             class="juego-otros-card__logo">
-                    <?php else : ?>
-                        <h3 class="juego-otros-card__title"><?php the_title(); ?></h3>
-                    <?php endif; ?>
-                    <div class="juego-otros-card__meta">
-                        <?php if ( $ogenero ) : ?>
-                            <span class="juego-hero__badge juego-hero__badge--genre"><?php echo esc_html( $ogenero ); ?></span>
-                        <?php endif; ?>
-                        <?php if ( $oestado_label ) : ?>
-                            <span class="juego-hero__badge juego-hero__badge--estado juego-hero__badge--<?php echo esc_attr( $oestado ); ?>"><?php echo esc_html( $oestado_label ); ?></span>
-                        <?php endif; ?>
-                    </div>
+                    <h3 class="juego-otros-card__title"><?php the_title(); ?></h3>
+                    <span class="juego-otros-card__cta">
+                        Ver juego
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                    </span>
                 </div>
             </a>
         <?php endwhile; wp_reset_postdata(); ?>

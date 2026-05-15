@@ -2012,6 +2012,35 @@ p {
     color: var(--color-gold);
 }
 
+/* ── Fila 1: Destacado ───────────────────────────────────────────────────── */
+.team-row--featured {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-6);
+}
+
+.team-card--featured {
+    width: 38%;
+}
+
+.team-card--featured .team-card__name {
+    font-size: var(--text-xl);
+}
+
+.team-card--featured .team-card__role {
+    font-size: var(--text-xs);
+}
+
+/* ── Fila 2: Segunda fila ────────────────────────────────────────────────── */
+.team-row--second {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+    max-width: 72%;
+    margin-inline: auto;
+}
+
 
 /* =============================================================================
    24. CONTACT PAGE
@@ -2297,6 +2326,8 @@ p {
     .team-grid       { grid-template-columns: repeat(3, 1fr); }
     .gallery-grid    { grid-template-columns: repeat(2, 1fr); }
 
+    .team-card--featured { width: 46%; }
+
     .contact-grid { grid-template-columns: 1fr; gap: var(--space-12); }
 }
 
@@ -2318,6 +2349,9 @@ p {
     .team-grid      { grid-template-columns: repeat(2, 1fr); }
     .gallery-grid   { grid-template-columns: 1fr 1fr; }
 
+    .team-card--featured { width: 60%; }
+    .team-row--second { grid-template-columns: 1fr; max-width: 60%; }
+
     .grid-2 { grid-template-columns: 1fr; }
     .grid-3 { grid-template-columns: 1fr; }
     .grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -2336,6 +2370,9 @@ p {
     .platforms-grid { grid-template-columns: repeat(2, 1fr); }
     .team-grid      { grid-template-columns: 1fr 1fr; }
     .gallery-grid   { grid-template-columns: 1fr; }
+
+    .team-card--featured { width: 80%; }
+    .team-row--second { max-width: 80%; }
     .grid-4         { grid-template-columns: 1fr; }
 
     .hero__title { font-size: clamp(2.25rem, 14vw, 3.5rem); }
@@ -3111,19 +3148,40 @@ p {
     display: flex;
     align-items: flex-end;
     border: 1px solid var(--color-border);
-    transition: transform var(--transition), box-shadow var(--transition);
+    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
     cursor: pointer;
+}
+
+.juego-otros-card::after {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: var(--color-gold);
+    opacity: 0;
+    transition: opacity var(--transition);
+    z-index: 2;
 }
 
 .juego-otros-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.6), 0 0 0 1px var(--color-border-gold);
+    border-color: var(--color-border-gold);
+}
+
+.juego-otros-card:hover::after {
+    opacity: 1;
 }
 
 .juego-otros-card__overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.05) 100%);
+    transition: background var(--transition);
+}
+
+.juego-otros-card:hover .juego-otros-card__overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.1) 100%);
 }
 
 .juego-otros-card__body {
@@ -3155,6 +3213,25 @@ p {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+}
+
+.juego-otros-card__cta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity var(--transition), transform var(--transition);
+}
+
+.juego-otros-card:hover .juego-otros-card__cta {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────────── */
